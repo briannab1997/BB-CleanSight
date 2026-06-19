@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CleanSight Data Quality Report</title>
+  <meta name="description" content="CleanSight is an interactive CSV data quality inspector powered by client-side JavaScript and a Python analyzer in the repository." />
+  <title>CleanSight Data Quality Inspector</title>
   <style>
     :root {
       --charcoal: #2C2B30;
@@ -11,8 +12,14 @@
       --silver: #D6D6D6;
       --rose: #F2C4CE;
       --coral: #F58F7C;
-      --paper: #f5f4f2;
+      --paper: #f6f4f2;
       --white: #ffffff;
+      --ink: #232229;
+      --muted: #737179;
+      --line: #ded8d9;
+      --shadow: 0 24px 70px rgba(17, 16, 20, 0.28);
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -21,25 +28,34 @@
       margin: 0;
       min-height: 100vh;
       background:
-        radial-gradient(circle at 8% 12%, rgba(242, 196, 206, 0.24), transparent 28%),
-        linear-gradient(135deg, var(--charcoal), #1f1e23 58%, #3a393f);
-      color: var(--charcoal);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        radial-gradient(circle at 8% 10%, rgba(242, 196, 206, 0.26), transparent 28%),
+        linear-gradient(135deg, var(--charcoal), #202025 56%, #47464a);
+      color: var(--ink);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
     }
 
     .shell {
-      width: min(1180px, calc(100vw - 32px));
-      margin: 32px auto;
+      width: min(1240px, calc(100vw - 28px));
+      margin: 28px auto;
+      overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.16);
       background: var(--paper);
-      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.32);
+      box-shadow: var(--shadow);
     }
 
-    header {
+    .hero {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 24px;
-      padding: 34px;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 26px;
+      padding: 32px;
       background: var(--charcoal);
       color: var(--white);
     }
@@ -47,7 +63,7 @@
     .eyebrow {
       margin: 0 0 8px;
       color: var(--rose);
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 900;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -55,26 +71,64 @@
 
     h1 {
       margin: 0;
-      font-size: clamp(2.4rem, 6vw, 5.8rem);
-      line-height: 0.95;
+      font-size: clamp(2.45rem, 6.5vw, 6rem);
+      line-height: 0.94;
       letter-spacing: 0;
     }
 
-    .subtitle {
-      max-width: 610px;
-      margin: 16px 0 0;
+    .hero p {
+      max-width: 680px;
       color: var(--silver);
-      font-size: 1rem;
-      line-height: 1.55;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .btn,
+    .upload-label {
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      padding: 10px 13px;
+      background: var(--coral);
+      color: var(--charcoal);
+      font-size: 0.86rem;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .btn.secondary,
+    .upload-label {
+      border-color: rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--white);
+    }
+
+    .upload-label input {
+      display: none;
+    }
+
+    .score-card {
+      align-self: center;
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 20px;
     }
 
     .score-ring {
-      width: 158px;
-      height: 158px;
+      width: 168px;
+      height: 168px;
       display: grid;
       place-items: center;
       border-radius: 50%;
-      background: conic-gradient(var(--coral) 87%, rgba(255,255,255,0.12) 0);
+      background: conic-gradient(var(--coral) var(--score, 87%), rgba(255,255,255,0.12) 0);
       position: relative;
     }
 
@@ -90,7 +144,13 @@
       position: relative;
       z-index: 1;
       color: var(--white);
-      font-size: 2.4rem;
+      font-size: 2.6rem;
+    }
+
+    .score-card span {
+      color: var(--silver);
+      font-size: 0.82rem;
+      text-align: center;
     }
 
     .metrics {
@@ -102,7 +162,7 @@
     }
 
     .metric {
-      border: 1px solid rgba(44, 43, 48, 0.16);
+      border: 1px solid rgba(44, 43, 48, 0.14);
       background: rgba(255, 255, 255, 0.62);
       padding: 16px;
     }
@@ -110,8 +170,9 @@
     .metric span {
       display: block;
       color: var(--graphite);
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 900;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
     }
 
@@ -121,239 +182,696 @@
       font-size: 2rem;
     }
 
-    main {
+    .workspace {
       display: grid;
       gap: 18px;
       padding: 24px;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 0.85fr 1.15fr;
+    .tabs,
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tab,
+    .filter {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--white);
+      color: var(--graphite);
+      padding: 9px 13px;
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .tab.active,
+    .filter.active {
+      border-color: var(--coral);
+      background: var(--charcoal);
+      color: var(--white);
+    }
+
+    .view {
+      display: none;
       gap: 18px;
     }
 
-    section {
-      border: 1px solid var(--silver);
+    .view.active {
+      display: grid;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 18px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
       background: var(--white);
       padding: 18px;
     }
 
-    h2 {
-      margin: 0 0 14px;
-      font-size: 1.1rem;
+    h2,
+    h3 {
+      margin: 0;
+      letter-spacing: 0;
     }
 
-    ul {
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .summary-list {
       margin: 0;
       padding-left: 20px;
       color: var(--graphite);
-      line-height: 1.7;
+      line-height: 1.75;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.84rem;
-    }
-
-    th, td {
-      border-bottom: 1px solid #ececec;
-      padding: 10px 8px;
-      text-align: left;
-    }
-
-    th {
-      color: var(--graphite);
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .warnings {
+    .issue-list,
+    .column-list {
       display: grid;
       gap: 10px;
     }
 
-    .warning {
+    .issue-card,
+    .column-card {
+      border: 1px solid var(--line);
       border-left: 5px solid var(--coral);
-      background: #fff4f1;
+      background: #fff8f6;
       padding: 12px;
     }
 
-    .warning strong {
+    .column-card {
+      border-left-color: var(--graphite);
+      background: var(--paper);
+      text-align: left;
+    }
+
+    .column-card.active {
+      border-left-color: var(--coral);
+      background: #fff1ee;
+    }
+
+    .issue-card strong,
+    .column-card strong {
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
-    footer {
-      padding: 16px 24px 24px;
-      color: var(--graphite);
-      font-size: 0.8rem;
+    .issue-card span,
+    .column-card span {
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.45;
     }
 
-    @media (max-width: 820px) {
-      header,
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .detail-stat {
+      border: 1px solid var(--line);
+      background: var(--paper);
+      padding: 12px;
+    }
+
+    .detail-stat span {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .detail-stat strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 1.4rem;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      background: var(--white);
+      max-height: 530px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 820px;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #ece8e8;
+      padding: 10px 9px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: var(--charcoal);
+      color: var(--white);
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    tr.flagged td {
+      background: #fff3f1;
+    }
+
+    .badge {
+      display: inline-flex;
+      border-radius: 999px;
+      background: var(--rose);
+      color: var(--charcoal);
+      padding: 4px 8px;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .code-box {
+      overflow: auto;
+      max-height: 460px;
+      border: 1px solid #3b3940;
+      background: var(--charcoal);
+      color: #f4eff0;
+      padding: 14px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 900px) {
+      .hero,
       .grid,
-      .metrics {
+      .metrics,
+      .detail-grid {
         grid-template-columns: 1fr;
-      }
-
-      .score-ring {
-        width: 132px;
-        height: 132px;
       }
     }
   </style>
 </head>
 <body>
   <div class="shell">
-    <header>
+    <header class="hero">
       <div>
-        <p class="eyebrow">CleanSight Report</p>
-        <h1>Data Quality<br />Inspection</h1>
-        <p class="subtitle">Scanned sample_customers.csv for missing values, duplicates, invalid formats, outliers, and inconsistent categories.</p>
+        <p class="eyebrow">CleanSight Interactive Demo</p>
+        <h1>Data Quality<br />Inspector</h1>
+        <p>
+          Scan a messy CSV for missing values, duplicates, invalid formats, outliers,
+          and inconsistent categories. This GitHub Pages demo runs in the browser;
+          the repository also includes the Python CLI analyzer.
+        </p>
+        <div class="hero-actions">
+          <button class="btn" id="load-sample">Load Sample Data</button>
+          <label class="upload-label">
+            Upload CSV
+            <input id="csv-upload" type="file" accept=".csv,text/csv" />
+          </label>
+          <button class="btn secondary" id="download-cleaned">Download Cleaned CSV</button>
+          <button class="btn secondary" id="download-json">Download JSON Summary</button>
+        </div>
       </div>
-      <div class="score-ring" aria-label="Quality score">
-        <strong>87</strong>
-      </div>
+      <aside class="score-card">
+        <div class="score-ring" id="score-ring">
+          <strong id="quality-score">87</strong>
+        </div>
+        <span id="score-caption">Quality score for sample_customers.csv</span>
+      </aside>
     </header>
 
-    <div class="metrics">
-      <div class="metric"><span>Rows</span><strong>13</strong></div>
-      <div class="metric"><span>Columns</span><strong>8</strong></div>
-      <div class="metric"><span>Issues</span><strong>14</strong></div>
-      <div class="metric"><span>Duplicates</span><strong>1</strong></div>
-    </div>
+    <section class="metrics" id="metrics"></section>
 
-    <main>
-      <div class="grid">
-        <section>
-          <h2>Executive Summary</h2>
-          <ul><li>Scanned 13 rows across 8 columns.</li>
-<li>Found 14 total data quality signals.</li>
-<li>Calculated a quality score of 87/100.</li>
-<li>Removed 1 duplicate row(s) in the cleaned export.</li>
-<li>Highest missing-value columns: name (1), phone (1), signup_date (1).</li></ul>
-        </section>
-        <section>
-          <h2>Category Warnings</h2>
-          <div class="warnings"><div class="warning"><strong>region</strong>Inconsistent casing/spacing: West, west</div>
-<div class="warning"><strong>region</strong>Rare category value: central</div>
-<div class="warning"><strong>region</strong>Rare category value: northeast</div>
-<div class="warning"><strong>status</strong>Inconsistent casing/spacing: Active, active</div></div>
-        </section>
-      </div>
+    <main class="workspace">
+      <nav class="tabs" aria-label="CleanSight views">
+        <button class="tab active" data-view="overview">Overview</button>
+        <button class="tab" data-view="columns">Columns</button>
+        <button class="tab" data-view="records">Records</button>
+        <button class="tab" data-view="exports">Exports</button>
+      </nav>
 
-      <section>
-        <h2>Column Profile</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Column</th>
-              <th>Missing</th>
-              <th>Unique</th>
-              <th>Bad Dates</th>
-              <th>Bad Emails</th>
-              <th>Bad Phones</th>
-              <th>Outliers</th>
-            </tr>
-          </thead>
-          <tbody>
-        <tr>
-          <td>customer_id</td>
-          <td>0</td>
-          <td>12</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-        </tr>
-        
+      <section class="view active" id="view-overview">
+        <div class="grid">
+          <article class="panel">
+            <div class="panel-head">
+              <h2>Executive Summary</h2>
+              <span class="badge" id="source-name">sample_customers.csv</span>
+            </div>
+            <ul class="summary-list" id="summary-list"></ul>
+          </article>
+          <article class="panel">
+            <div class="panel-head">
+              <h2>Issue Explorer</h2>
+            </div>
+            <div class="filters" id="issue-filters"></div>
+            <div class="issue-list" id="issue-list"></div>
+          </article>
+        </div>
+      </section>
 
-        <tr>
-          <td>name</td>
-          <td>1</td>
-          <td>11</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-        </tr>
-        
+      <section class="view" id="view-columns">
+        <div class="grid">
+          <article class="panel">
+            <div class="panel-head">
+              <h2>Click a Column</h2>
+            </div>
+            <div class="column-list" id="column-list"></div>
+          </article>
+          <article class="panel">
+            <div class="panel-head">
+              <h2 id="column-title">Column Details</h2>
+              <span class="badge" id="column-risk">Select</span>
+            </div>
+            <p class="note" id="column-note">Choose a column to inspect missing values, invalid formats, uniqueness, examples, and related issues.</p>
+            <div class="detail-grid" id="column-details"></div>
+          </article>
+        </div>
+      </section>
 
-        <tr>
-          <td>email</td>
-          <td>0</td>
-          <td>12</td>
-          <td>0</td>
-          <td>3</td>
-          <td>0</td>
-          <td>0</td>
-        </tr>
-        
+      <section class="view" id="view-records">
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Data Preview</h2>
+            <span class="badge" id="flagged-count">Flagged rows</span>
+          </div>
+          <div class="table-wrap">
+            <table id="data-table"></table>
+          </div>
+        </article>
+      </section>
 
-        <tr>
-          <td>phone</td>
-          <td>1</td>
-          <td>10</td>
-          <td>0</td>
-          <td>0</td>
-          <td>1</td>
-          <td>0</td>
-        </tr>
-        
-
-        <tr>
-          <td>signup_date</td>
-          <td>1</td>
-          <td>11</td>
-          <td>1</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-        </tr>
-        
-
-        <tr>
-          <td>region</td>
-          <td>0</td>
-          <td>6</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-        </tr>
-        
-
-        <tr>
-          <td>status</td>
-          <td>0</td>
-          <td>4</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-        </tr>
-        
-
-        <tr>
-          <td>monthly_spend</td>
-          <td>0</td>
-          <td>12</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-          <td>1</td>
-        </tr>
-        </tbody>
-        </table>
+      <section class="view" id="view-exports">
+        <div class="grid">
+          <article class="panel">
+            <div class="panel-head">
+              <h2>JSON Summary</h2>
+            </div>
+            <pre class="code-box" id="json-output"></pre>
+          </article>
+          <article class="panel">
+            <div class="panel-head">
+              <h2>Cleaned CSV Preview</h2>
+            </div>
+            <pre class="code-box" id="cleaned-output"></pre>
+          </article>
+        </div>
       </section>
     </main>
-
-    <footer>
-      Generated by CleanSight. Palette inspired by charcoal, graphite, silver, rose, and coral data-report styling.
-    </footer>
   </div>
+
+  <script>
+    const SAMPLE_CSV = `customer_id,name,email,phone,signup_date,region,status,monthly_spend
+1001,Avery Brooks,avery.brooks@example.com,"(904) 555-1088",2026-01-15,North,Active,89.50
+1002,Morgan Lee,morgan.lee@example,904-555-8821,2026-02-02,South,active,74.25
+1003,Taylor Smith,taylor.smith@example.com,9045554411,02/18/2026,East,Active,121.75
+1004,Jordan Davis,jordan.davis@example.com,,2026-02-29,West,Paused,58.00
+1005,Casey Nguyen,casey.nguyen@example.com,+1 904 555 0199,2026-03-04,west,Paused,62.00
+1006,Riley Patel,riley.patel@example.com,904.555.6182,2026/03/12,North,Active,95.00
+1007,Jamie Carter,jamie.carter@,904-555-1020,2026-04-01,South,Cancelled,0
+1008,Drew Wilson,drew.wilson@example.com,904-555-7788,2026-04-12,Central,Active,1100.00
+1009,Quinn Reed,quinn.reed@example.com,904-555-2121,,North,Active,82.10
+1010,Skyler Ross,skyler.ross@example.com,904-555-7788,2026-04-22,South,Trial,15.00
+1010,Skyler Ross,skyler.ross@example.com,904-555-7788,2026-04-22,South,Trial,15.00
+1011,,no-email,not available,2026-05-05,East,Active,77.35
+1012,Harper Young,harper.young@example.com,904-555-9090,05/13/26,Northeast,Active,88.80`;
+
+    const state = {
+      source: "sample_customers.csv",
+      rows: [],
+      headers: [],
+      result: null,
+      issueFilter: "All",
+      selectedColumn: null
+    };
+
+    const emailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    const phonePattern = /^\+?[\d\s().-]{7,}$/;
+
+    function parseCsv(text) {
+      const lines = text.trim().split(/\r?\n/);
+      const headers = splitCsvLine(lines[0]);
+      const rows = lines.slice(1).filter(Boolean).map(line => {
+        const values = splitCsvLine(line);
+        return Object.fromEntries(headers.map((header, index) => [header, (values[index] || "").trim()]));
+      });
+      return { headers, rows };
+    }
+
+    function splitCsvLine(line) {
+      const values = [];
+      let current = "";
+      let quoted = false;
+      for (const char of line) {
+        if (char === '"') quoted = !quoted;
+        else if (char === "," && !quoted) {
+          values.push(current);
+          current = "";
+        } else current += char;
+      }
+      values.push(current);
+      return values;
+    }
+
+    function inspect(rows, headers, source) {
+      const duplicates = countDuplicates(rows, headers);
+      const columns = headers.map(header => profileColumn(header, rows));
+      const categoryWarnings = buildCategoryWarnings(rows, headers);
+      const issueCards = buildIssues(columns, categoryWarnings, duplicates);
+      const issueCount = issueCards.reduce((sum, issue) => sum + issue.count, 0);
+      const qualityScore = Math.max(0, Math.round(100 - ((issueCount / Math.max(1, rows.length * headers.length)) * 100)));
+      const summary = [
+        `Scanned ${rows.length} rows across ${headers.length} columns.`,
+        `Found ${issueCount} total data quality signals.`,
+        `Calculated a quality score of ${qualityScore}/100.`,
+        duplicates ? `Removed ${duplicates} duplicate row(s) in the cleaned export.` : "No duplicate rows were detected.",
+        missingSummary(columns)
+      ].filter(Boolean);
+      return { source, row_count: rows.length, column_count: headers.length, duplicate_rows: duplicates, issue_count: issueCount, quality_score: qualityScore, columns, category_warnings: categoryWarnings, issues: issueCards, summary };
+    }
+
+    function profileColumn(header, rows) {
+      const values = rows.map(row => (row[header] || "").trim());
+      const nonEmpty = values.filter(Boolean);
+      const profile = {
+        name: header,
+        total: values.length,
+        missing: values.length - nonEmpty.length,
+        unique: new Set(nonEmpty.map(value => value.toLowerCase())).size,
+        invalid_dates: 0,
+        invalid_emails: 0,
+        invalid_phones: 0,
+        outliers: 0,
+        examples: nonEmpty.slice(0, 3)
+      };
+      if (looksLikeDate(header)) profile.invalid_dates = nonEmpty.filter(value => !isValidDate(value)).length;
+      if (looksLikeEmail(header)) profile.invalid_emails = nonEmpty.filter(value => !emailPattern.test(value)).length;
+      if (looksLikePhone(header)) profile.invalid_phones = nonEmpty.filter(value => !phonePattern.test(value)).length;
+      const numeric = nonEmpty.filter(canNumber).map(value => Number(value.replaceAll(",", "")));
+      if (numeric.length >= 4) {
+        const avg = numeric.reduce((sum, value) => sum + value, 0) / numeric.length;
+        const dev = Math.sqrt(numeric.reduce((sum, value) => sum + ((value - avg) ** 2), 0) / numeric.length);
+        profile.outliers = dev ? numeric.filter(value => Math.abs(value - avg) > dev * 2).length : 0;
+      }
+      return profile;
+    }
+
+    function buildCategoryWarnings(rows, headers) {
+      const warnings = {};
+      headers.filter(looksLikeCategory).forEach(header => {
+        const values = rows.map(row => (row[header] || "").trim()).filter(Boolean);
+        const lowerGroups = {};
+        values.forEach(value => {
+          lowerGroups[value.toLowerCase()] ||= new Set();
+          lowerGroups[value.toLowerCase()].add(value);
+        });
+        warnings[header] = [];
+        Object.values(lowerGroups).forEach(group => {
+          if (group.size > 1) warnings[header].push(`Inconsistent casing/spacing: ${[...group].sort().join(", ")}`);
+        });
+        const counts = values.reduce((acc, value) => {
+          const key = value.toLowerCase();
+          acc[key] = (acc[key] || 0) + 1;
+          return acc;
+        }, {});
+        if (Object.keys(counts).length > 4) {
+          Object.entries(counts).filter(([, count]) => count === 1).slice(0, 4).forEach(([value]) => {
+            warnings[header].push(`Rare category value: ${value}`);
+          });
+        }
+        if (!warnings[header].length) delete warnings[header];
+      });
+      return warnings;
+    }
+
+    function buildIssues(columns, categoryWarnings, duplicates) {
+      const issues = [];
+      if (duplicates) issues.push({ type: "Duplicates", title: "Duplicate rows", count: duplicates, detail: `${duplicates} duplicate row(s) will be removed from the cleaned export.` });
+      columns.forEach(column => {
+        [["Missing", column.missing], ["Bad Dates", column.invalid_dates], ["Bad Emails", column.invalid_emails], ["Bad Phones", column.invalid_phones], ["Outliers", column.outliers]].forEach(([type, count]) => {
+          if (count) issues.push({ type, title: `${column.name}: ${type}`, count, detail: `${count} signal(s) detected in ${column.name}.` });
+        });
+      });
+      Object.entries(categoryWarnings).forEach(([column, warnings]) => warnings.forEach(warning => {
+        issues.push({ type: "Categories", title: `${column}: category warning`, count: 1, detail: warning });
+      }));
+      return issues;
+    }
+
+    function countDuplicates(rows, headers) {
+      const seen = new Set();
+      let duplicates = 0;
+      rows.forEach(row => {
+        const key = headers.map(header => (row[header] || "").trim().toLowerCase()).join("|");
+        if (seen.has(key)) duplicates += 1;
+        else seen.add(key);
+      });
+      return duplicates;
+    }
+
+    function cleanedRows() {
+      const seen = new Set();
+      return state.rows.filter(row => {
+        const key = state.headers.map(header => (row[header] || "").trim().toLowerCase()).join("|");
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    function toCsv(rows, headers) {
+      return [headers.join(","), ...rows.map(row => headers.map(header => csvEscape(row[header] || "")).join(","))].join("\\n");
+    }
+
+    function csvEscape(value) {
+      return /[",\n]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value;
+    }
+
+    function canNumber(value) {
+      return value && !Number.isNaN(Number(value.replaceAll(",", "")));
+    }
+
+    function looksLikeDate(name) {
+      return ["date", "dob", "created", "updated", "closed", "started"].some(hint => name.toLowerCase().includes(hint));
+    }
+
+    function looksLikeEmail(name) {
+      return name.toLowerCase().includes("email");
+    }
+
+    function looksLikePhone(name) {
+      return ["phone", "mobile", "cell"].some(hint => name.toLowerCase().includes(hint));
+    }
+
+    function looksLikeCategory(name) {
+      return ["status", "category", "segment", "region", "priority", "type"].some(hint => name.toLowerCase().includes(hint));
+    }
+
+    function isValidDate(value) {
+      const trimmed = value.trim();
+      const ymd = trimmed.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+      const mdy = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+      if (ymd) return validDateParts(Number(ymd[1]), Number(ymd[2]), Number(ymd[3]));
+      if (mdy) {
+        const year = mdy[3].length === 2 ? Number(`20${mdy[3]}`) : Number(mdy[3]);
+        return validDateParts(year, Number(mdy[1]), Number(mdy[2]));
+      }
+      return false;
+    }
+
+    function validDateParts(year, month, day) {
+      const date = new Date(year, month - 1, day);
+      return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+    }
+
+    function missingSummary(columns) {
+      const missing = [...columns].sort((a, b) => b.missing - a.missing).filter(column => column.missing).slice(0, 3);
+      return missing.length ? `Highest missing-value columns: ${missing.map(column => `${column.name} (${column.missing})`).join(", ")}.` : "";
+    }
+
+    function loadCsv(text, source) {
+      const parsed = parseCsv(text);
+      state.source = source;
+      state.headers = parsed.headers;
+      state.rows = parsed.rows;
+      state.result = inspect(state.rows, state.headers, source);
+      state.selectedColumn = state.headers[0];
+      state.issueFilter = "All";
+      render();
+    }
+
+    function render() {
+      document.documentElement.style.setProperty("--score", `${state.result.quality_score}%`);
+      document.getElementById("quality-score").textContent = state.result.quality_score;
+      document.getElementById("score-caption").textContent = `Quality score for ${state.source}`;
+      document.getElementById("source-name").textContent = state.source;
+      renderMetrics();
+      renderSummary();
+      renderFilters();
+      renderIssues();
+      renderColumns();
+      renderColumnDetail();
+      renderTable();
+      renderExports();
+    }
+
+    function renderMetrics() {
+      document.getElementById("metrics").innerHTML = [
+        ["Rows", state.result.row_count],
+        ["Columns", state.result.column_count],
+        ["Issues", state.result.issue_count],
+        ["Duplicates", state.result.duplicate_rows]
+      ].map(([label, value]) => `<article class="metric"><span>${label}</span><strong>${value}</strong></article>`).join("");
+    }
+
+    function renderSummary() {
+      document.getElementById("summary-list").innerHTML = state.result.summary.map(item => `<li>${item}</li>`).join("");
+    }
+
+    function renderFilters() {
+      const types = ["All", ...new Set(state.result.issues.map(issue => issue.type))];
+      document.getElementById("issue-filters").innerHTML = types.map(type => `<button class="filter ${state.issueFilter === type ? "active" : ""}" data-filter="${type}">${type}</button>`).join("");
+      document.querySelectorAll("[data-filter]").forEach(button => {
+        button.addEventListener("click", () => {
+          state.issueFilter = button.dataset.filter;
+          renderFilters();
+          renderIssues();
+        });
+      });
+    }
+
+    function renderIssues() {
+      const issues = state.result.issues.filter(issue => state.issueFilter === "All" || issue.type === state.issueFilter);
+      document.getElementById("issue-list").innerHTML = issues.length
+        ? issues.map(issue => `<article class="issue-card"><strong>${issue.title} <span class="badge">${issue.count}</span></strong><span>${issue.detail}</span></article>`).join("")
+        : `<article class="issue-card"><strong>No issues in this filter</strong><span>Try another issue type or upload a different CSV.</span></article>`;
+    }
+
+    function renderColumns() {
+      document.getElementById("column-list").innerHTML = state.result.columns.map(column => {
+        const issueTotal = column.missing + column.invalid_dates + column.invalid_emails + column.invalid_phones + column.outliers;
+        return `<button class="column-card ${state.selectedColumn === column.name ? "active" : ""}" data-column="${column.name}">
+          <strong>${column.name}</strong>
+          <span>${column.unique} unique · ${issueTotal} issue signal(s)</span>
+        </button>`;
+      }).join("");
+      document.querySelectorAll("[data-column]").forEach(button => {
+        button.addEventListener("click", () => {
+          state.selectedColumn = button.dataset.column;
+          renderColumns();
+          renderColumnDetail();
+        });
+      });
+    }
+
+    function renderColumnDetail() {
+      const column = state.result.columns.find(item => item.name === state.selectedColumn);
+      if (!column) return;
+      const issueTotal = column.missing + column.invalid_dates + column.invalid_emails + column.invalid_phones + column.outliers;
+      document.getElementById("column-title").textContent = column.name;
+      document.getElementById("column-risk").textContent = issueTotal ? `${issueTotal} issue(s)` : "Clean";
+      document.getElementById("column-note").textContent = `Examples: ${column.examples.join(", ") || "No non-empty examples available."}`;
+      document.getElementById("column-details").innerHTML = [
+        ["Missing", column.missing],
+        ["Unique", column.unique],
+        ["Bad Dates", column.invalid_dates],
+        ["Bad Emails", column.invalid_emails],
+        ["Bad Phones", column.invalid_phones],
+        ["Outliers", column.outliers]
+      ].map(([label, value]) => `<div class="detail-stat"><span>${label}</span><strong>${value}</strong></div>`).join("");
+    }
+
+    function renderTable() {
+      const flaggedIndexes = flaggedRowIndexes();
+      document.getElementById("flagged-count").textContent = `${flaggedIndexes.size} flagged rows`;
+      document.getElementById("data-table").innerHTML = `
+        <thead><tr>${state.headers.map(header => `<th>${header}</th>`).join("")}</tr></thead>
+        <tbody>${state.rows.map((row, index) => `<tr class="${flaggedIndexes.has(index) ? "flagged" : ""}">${state.headers.map(header => `<td>${escapeHtml(row[header] || "")}</td>`).join("")}</tr>`).join("")}</tbody>
+      `;
+    }
+
+    function flaggedRowIndexes() {
+      const flagged = new Set();
+      const seen = new Map();
+      state.rows.forEach((row, index) => {
+        const key = state.headers.map(header => (row[header] || "").trim().toLowerCase()).join("|");
+        if (seen.has(key)) flagged.add(index);
+        else seen.set(key, index);
+        state.headers.forEach(header => {
+          const value = (row[header] || "").trim();
+          if (!value) flagged.add(index);
+          if (looksLikeEmail(header) && value && !emailPattern.test(value)) flagged.add(index);
+          if (looksLikePhone(header) && value && !phonePattern.test(value)) flagged.add(index);
+          if (looksLikeDate(header) && value && !isValidDate(value)) flagged.add(index);
+        });
+      });
+      return flagged;
+    }
+
+    function renderExports() {
+      const cleanCsv = toCsv(cleanedRows(), state.headers);
+      document.getElementById("json-output").textContent = JSON.stringify(state.result, null, 2);
+      document.getElementById("cleaned-output").textContent = cleanCsv;
+    }
+
+    function download(name, text, type) {
+      const blob = new Blob([text], { type });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = name;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    document.querySelectorAll("[data-view]").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab === button));
+        document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === `view-${button.dataset.view}`));
+      });
+    });
+
+    document.getElementById("load-sample").addEventListener("click", () => loadCsv(SAMPLE_CSV, "sample_customers.csv"));
+    document.getElementById("download-cleaned").addEventListener("click", () => download("cleaned-data.csv", toCsv(cleanedRows(), state.headers), "text/csv"));
+    document.getElementById("download-json").addEventListener("click", () => download("cleansight-summary.json", JSON.stringify(state.result, null, 2), "application/json"));
+    document.getElementById("csv-upload").addEventListener("change", event => {
+      const file = event.target.files[0];
+      if (!file) return;
+      file.text().then(text => loadCsv(text, file.name));
+    });
+
+    loadCsv(SAMPLE_CSV, "sample_customers.csv");
+  </script>
 </body>
 </html>

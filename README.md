@@ -6,9 +6,11 @@ CleanSight is a Python data quality inspector for messy CSV files. I built it to
 
 ## Live Demo
 
-View the generated report on GitHub Pages:
+Use the interactive GitHub Pages demo:
 
 https://briannab1997.github.io/BB-CleanSight/
+
+The live demo runs in the browser and lets users load sample data, upload a CSV, click through issue filters, inspect columns, preview flagged records, and download cleaned CSV or JSON outputs.
 
 ## Why I Built It
 
@@ -30,6 +32,7 @@ The project is intentionally not tied to one industry. It could apply to custome
 ## What It Generates
 
 - Styled HTML data quality report
+- Interactive GitHub Pages demo
 - Cleaned CSV export with duplicates removed
 - JSON summary for downstream automation
 - CLI summary in the terminal

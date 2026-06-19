@@ -1,5 +1,5 @@
 customer_id,name,email,phone,signup_date,region,status,monthly_spend
-1001,Avery Brooks,avery.brooks@example.com,(904) 555-1088,2026-01-15,North,Active,89.50
+1001,Avery Brooks,avery.brooks@example.com,"(904) 555-1088",2026-01-15,North,Active,89.50
 1002,Morgan Lee,morgan.lee@example,904-555-8821,2026-02-02,South,active,74.25
 1003,Taylor Smith,taylor.smith@example.com,9045554411,02/18/2026,East,Active,121.75
 1004,Jordan Davis,jordan.davis@example.com,,2026-02-29,West,Paused,58.00
