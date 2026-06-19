@@ -4,6 +4,12 @@ CleanSight is a Python data quality inspector for messy CSV files. I built it to
 
 ![CleanSight report](assets/cleansight-report.png)
 
+## Live Demo
+
+View the generated report on GitHub Pages:
+
+https://briannab1997.github.io/BB-CleanSight/
+
 ## Why I Built It
 
 Almost every organization has messy data somewhere. CleanSight focuses on the kind of cleanup work that helps teams trust their reports: missing values, duplicates, invalid formats, inconsistent categories, and unusual numeric values.
