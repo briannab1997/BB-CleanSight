@@ -1,0 +1,14 @@
+customer_id,name,email,phone,signup_date,region,status,monthly_spend
+1001,Avery Brooks,avery.brooks@example.com,(904) 555-1088,2026-01-15,North,Active,89.50
+1002,Morgan Lee,morgan.lee@example,904-555-8821,2026-02-02,South,active,74.25
+1003,Taylor Smith,taylor.smith@example.com,9045554411,02/18/2026,East,Active,121.75
+1004,Jordan Davis,jordan.davis@example.com,,2026-02-29,West,Paused,58.00
+1005,Casey Nguyen,casey.nguyen@example.com,+1 904 555 0199,2026-03-04,west,Paused,62.00
+1006,Riley Patel,riley.patel@example.com,904.555.6182,2026/03/12,North,Active,95.00
+1007,Jamie Carter,jamie.carter@,904-555-1020,2026-04-01,South,Cancelled,0
+1008,Drew Wilson,drew.wilson@example.com,904-555-7788,2026-04-12,Central,Active,1100.00
+1009,Quinn Reed,quinn.reed@example.com,904-555-2121,,North,Active,82.10
+1010,Skyler Ross,skyler.ross@example.com,904-555-7788,2026-04-22,South,Trial,15.00
+1010,Skyler Ross,skyler.ross@example.com,904-555-7788,2026-04-22,South,Trial,15.00
+1011,,no-email,not available,2026-05-05,East,Active,77.35
+1012,Harper Young,harper.young@example.com,904-555-9090,05/13/26,Northeast,Active,88.80

@@ -1,0 +1,147 @@
+{
+  "source": "data/sample_customers.csv",
+  "row_count": 13,
+  "column_count": 8,
+  "duplicate_rows": 1,
+  "issue_count": 14,
+  "quality_score": 87,
+  "summary": [
+    "Scanned 13 rows across 8 columns.",
+    "Found 14 total data quality signals.",
+    "Calculated a quality score of 87/100.",
+    "Removed 1 duplicate row(s) in the cleaned export.",
+    "Highest missing-value columns: name (1), phone (1), signup_date (1)."
+  ],
+  "category_warnings": {
+    "region": [
+      "Inconsistent casing/spacing: West, west",
+      "Rare category value: central",
+      "Rare category value: northeast"
+    ],
+    "status": [
+      "Inconsistent casing/spacing: Active, active"
+    ]
+  },
+  "columns": [
+    {
+      "name": "customer_id",
+      "total": 13,
+      "missing": 0,
+      "unique": 12,
+      "invalid_dates": 0,
+      "invalid_emails": 0,
+      "invalid_phones": 0,
+      "outliers": 0,
+      "examples": [
+        "1001",
+        "1002",
+        "1003"
+      ]
+    },
+    {
+      "name": "name",
+      "total": 13,
+      "missing": 1,
+      "unique": 11,
+      "invalid_dates": 0,
+      "invalid_emails": 0,
+      "invalid_phones": 0,
+      "outliers": 0,
+      "examples": [
+        "Avery Brooks",
+        "Morgan Lee",
+        "Taylor Smith"
+      ]
+    },
+    {
+      "name": "email",
+      "total": 13,
+      "missing": 0,
+      "unique": 12,
+      "invalid_dates": 0,
+      "invalid_emails": 3,
+      "invalid_phones": 0,
+      "outliers": 0,
+      "examples": [
+        "avery.brooks@example.com",
+        "morgan.lee@example",
+        "taylor.smith@example.com"
+      ]
+    },
+    {
+      "name": "phone",
+      "total": 13,
+      "missing": 1,
+      "unique": 10,
+      "invalid_dates": 0,
+      "invalid_emails": 0,
+      "invalid_phones": 1,
+      "outliers": 0,
+      "examples": [
+        "(904) 555-1088",
+        "904-555-8821",
+        "9045554411"
+      ]
+    },
+    {
+      "name": "signup_date",
+      "total": 13,
+      "missing": 1,
+      "unique": 11,
+      "invalid_dates": 1,
+      "invalid_emails": 0,
+      "invalid_phones": 0,
+      "outliers": 0,
+      "examples": [
+        "2026-01-15",
+        "2026-02-02",
+        "02/18/2026"
+      ]
+    },
+    {
+      "name": "region",
+      "total": 13,
+      "missing": 0,
+      "unique": 6,
+      "invalid_dates": 0,
+      "invalid_emails": 0,
+      "invalid_phones": 0,
+      "outliers": 0,
+      "examples": [
+        "North",
+        "South",
+        "East"
+      ]
+    },
+    {
+      "name": "status",
+      "total": 13,
+      "missing": 0,
+      "unique": 4,
+      "invalid_dates": 0,
+      "invalid_emails": 0,
+      "invalid_phones": 0,
+      "outliers": 0,
+      "examples": [
+        "Active",
+        "active",
+        "Active"
+      ]
+    },
+    {
+      "name": "monthly_spend",
+      "total": 13,
+      "missing": 0,
+      "unique": 12,
+      "invalid_dates": 0,
+      "invalid_emails": 0,
+      "invalid_phones": 0,
+      "outliers": 1,
+      "examples": [
+        "89.50",
+        "74.25",
+        "121.75"
+      ]
+    }
+  ]
+}

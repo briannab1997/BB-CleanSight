@@ -1,0 +1,9 @@
+__pycache__/
+.pytest_cache/
+.DS_Store
+reports/*.html
+reports/*.csv
+reports/*.json
+!reports/cleansight-report.html
+!reports/cleaned-data.csv
+!reports/cleansight-summary.json

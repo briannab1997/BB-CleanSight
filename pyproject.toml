@@ -1,0 +1,9 @@
+[project]
+name = "cleansight"
+version = "1.0.0"
+description = "Python data quality inspector for messy CSV files."
+requires-python = ">=3.10"
+authors = [{ name = "Brianna Brockington" }]
+
+[project.scripts]
+cleansight = "cleansight.cli:main"
